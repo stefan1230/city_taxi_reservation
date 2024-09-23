@@ -9,7 +9,7 @@ function RateDriver({ passengerId }) {
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-            await axios.post('/api/passenger/rate', {
+            await axios.post('http://localhost:5000/api/passenger/rate', {
                 passengerId,
                 driverId,
                 rating,

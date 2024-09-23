@@ -11,7 +11,7 @@ function BookRide({ passengerId }) {
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-            const response = await axios.post('/api/passenger/book', {
+            const response = await axios.post('http://localhost:5000/api/passenger/book', {
                 passengerId,
                 driverId,
                 pickupLocation,

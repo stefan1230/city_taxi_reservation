@@ -5,7 +5,7 @@ function UpcomingRides({ passengerId }) {
     const [rides, setRides] = useState([]);
 
     useEffect(() => {
-        axios.get(`/api/passenger/upcoming/${passengerId}`)
+        axios.get(`http://localhost:5000/api/passenger/upcoming/${passengerId}`)
             .then(response => setRides(response.data.upcomingRides))
             .catch(error => console.log(error));
     }, [passengerId]);

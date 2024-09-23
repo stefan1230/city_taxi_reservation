@@ -6,7 +6,7 @@ function RideHistory({ driverId }) {
 
     useEffect(() => {
         // Fetch ride history on component mount
-        axios.get(`/api/driver/history/${driverId}`)
+        axios.get(`http://localhost:5000/api/driver/history/${driverId}`)
             .then(response => setHistory(response.data.rideHistory))
             .catch(error => console.log(error));
     }, [driverId]);

@@ -6,7 +6,7 @@ function UpcomingRides({ driverId }) {
 
     useEffect(() => {
         // Fetch upcoming rides on component mount
-        axios.get(`/api/driver/upcoming/${driverId}`)
+        axios.get(`http://localhost:5000/api/driver/upcoming/${driverId}`)
             .then(response => setRides(response.data.upcomingRides))
             .catch(error => console.log(error));
     }, [driverId]);

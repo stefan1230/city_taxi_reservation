@@ -5,7 +5,7 @@ function RideHistory({ passengerId }) {
     const [history, setHistory] = useState([]);
 
     useEffect(() => {
-        axios.get(`/api/passenger/history/${passengerId}`)
+        axios.get(`http://localhost:5000/api/passenger/history/${passengerId}`)
             .then(response => setHistory(response.data.rideHistory))
             .catch(error => console.log(error));
     }, [passengerId]);
