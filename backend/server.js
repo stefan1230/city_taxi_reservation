@@ -13,10 +13,12 @@ app.use(express.json());  // Parse incoming JSON requests
 // Import routes
 const authRoutes = require('./routes/auth');
 const bookingRoutes = require('./routes/booking');
+const driverRoutes = require('./routes/driver');
 
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/bookings', bookingRoutes);
+app.use('/api/driver', driverRoutes);
 
 // Test route to ensure the server is running
 app.get('/', (req, res) => {

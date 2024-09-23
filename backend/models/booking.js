@@ -21,14 +21,15 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
         },
         status: {
-            type: DataTypes.ENUM('CONFIRMED', 'CANCELLED'),
-            defaultValue: 'CONFIRMED',
+            type: DataTypes.ENUM('PENDING', 'CONFIRMED', 'CANCELLED'),
+            defaultValue: 'PENDING',
         }
     }, {});
 
+    // Alias associations to prevent Sequelize conflicts
     Booking.associate = function (models) {
-        Booking.belongsTo(models.User, { foreignKey: 'passengerId' });
-        Booking.belongsTo(models.User, { foreignKey: 'driverId' });
+        Booking.belongsTo(models.User, { foreignKey: 'passengerId', as: 'passenger' });
+        Booking.belongsTo(models.User, { foreignKey: 'driverId', as: 'driver' });
     };
 
     return Booking;

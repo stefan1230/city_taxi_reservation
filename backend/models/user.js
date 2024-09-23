@@ -1,3 +1,5 @@
+const bcrypt = require('bcryptjs');
+
 module.exports = (sequelize, DataTypes) => {
     const User = sequelize.define('User', {
         name: {
@@ -27,8 +29,12 @@ module.exports = (sequelize, DataTypes) => {
     }, {});
 
     User.associate = function (models) {
-        User.hasMany(models.Booking, { foreignKey: 'passengerId' });
-        User.hasMany(models.Booking, { foreignKey: 'driverId' });
+        User.hasMany(models.Booking, { foreignKey: 'passengerId', as: 'passengerBookings' });
+        User.hasMany(models.Booking, { foreignKey: 'driverId', as: 'driverBookings' });
+    };
+
+    User.prototype.validPassword = function (password) {
+        return bcrypt.compareSync(password, this.password);
     };
 
     return User;
