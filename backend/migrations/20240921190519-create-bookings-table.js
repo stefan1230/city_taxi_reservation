@@ -43,7 +43,7 @@ module.exports = {
         allowNull: false
       },
       status: {
-        type: Sequelize.ENUM('CONFIRMED', 'CANCELLED'),
+        type: Sequelize.ENUM('REQUESTED', 'PENDING', 'CONFIRMED', 'CANCELLED'),
         defaultValue: 'CONFIRMED'
       },
       createdAt: {

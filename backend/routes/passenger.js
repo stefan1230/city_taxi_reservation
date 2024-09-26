@@ -74,7 +74,7 @@ router.post('/book', async (req, res) => {
             pickupLocation,
             destination,
             fare,
-            status: 'PENDING'
+            status: 'REQUESTED'
         });
 
         res.status(201).json({ message: 'Ride booked successfully', booking: newBooking });
@@ -126,6 +126,37 @@ router.post('/rate', async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: 'Server error', error });
     }
+});
+
+
+router.get('/available-drivers', async (req, res) => {
+    console.log('hereee')
+    try {
+        const availableDrivers = await User.findAll({
+            where: {
+                role: 'driver',
+                driverStatus: 'AVAILABLE',
+            },
+            attributes: ['id', 'name', 'location'],  // Select necessary fields
+        });
+
+        res.status(200).json(availableDrivers);
+    } catch (error) {
+        console.error('Error fetching available drivers:', error);
+        res.status(500).json({ message: 'Error fetching available drivers' });
+    }
+});
+
+
+
+router.post('/signout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            return res.status(500).json({ message: 'Error signing out' });
+        }
+
+        res.status(200).json({ message: 'Signed out successfully' });
+    });
 });
 
 

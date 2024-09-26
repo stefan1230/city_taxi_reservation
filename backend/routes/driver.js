@@ -206,4 +206,62 @@ router.put('/accept', async (req, res) => {
     }
 });
 
+
+router.get('/available-drivers', async (req, res) => {
+    try {
+        const availableDrivers = await User.findAll({
+            where: {
+                role: 'driver',
+                driverStatus: 'AVAILABLE',
+            },
+            attributes: ['id', 'name', 'location'],  // Select necessary fields
+        });
+
+        res.status(200).json(availableDrivers);
+    } catch (error) {
+        console.error('Error fetching available drivers:', error);
+        res.status(500).json({ message: 'Error fetching available drivers' });
+    }
+});
+
+router.put('/confirm-booking/:bookingId', async (req, res) => {
+    const { bookingId } = req.params;
+
+    try {
+        const booking = await Booking.findByPk(bookingId);
+
+        if (!booking || booking.status !== 'REQUESTED') {
+            return res.status(404).json({ message: 'Booking not found or not in REQUESTED status' });
+        }
+
+        // Update the booking status to CONFIRMED
+        booking.status = 'CONFIRMED';
+        await booking.save();
+
+        res.status(200).json({ message: 'Booking confirmed', booking });
+    } catch (error) {
+        console.error('Error confirming booking:', error);
+        res.status(500).json({ message: 'Error confirming booking' });
+    }
+});
+
+router.get('/requested-bookings/:driverId', async (req, res) => {
+    const { driverId } = req.params;
+
+    try {
+        const requestedBookings = await Booking.findAll({
+            where: {
+                driverId,
+                status: 'REQUESTED',
+            },
+            include: [{ model: User, as: 'passenger', attributes: ['name', 'location'] }]  // Include passenger info
+        });
+
+        res.status(200).json(requestedBookings);
+    } catch (error) {
+        console.error('Error fetching requested bookings:', error);
+        res.status(500).json({ message: 'Error fetching requested bookings' });
+    }
+});
+
 module.exports = router;

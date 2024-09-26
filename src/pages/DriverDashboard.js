@@ -3,6 +3,7 @@ import DriverStatus from '../components/DriverStatus';
 import UpcomingRides from '../components/UpcomingRides';
 import RideHistory from '../components/RideHistory';
 import EarningsOverview from '../components/EarningsOverview';
+import RequestedBookings from '../components/RequestedBookings';
 
 function DriverDashboard() {
     const [driverId, setDriverId] = useState(null);
@@ -33,6 +34,7 @@ function DriverDashboard() {
                 <UpcomingRides driverId={driverId} />
                 <RideHistory driverId={driverId} />
                 <EarningsOverview driverId={driverId} />
+                <RequestedBookings driverId={driverId} />
             </div>
         </div>
     );

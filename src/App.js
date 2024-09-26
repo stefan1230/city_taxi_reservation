@@ -29,11 +29,13 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import LoginRegister from './components/LoginRegister';
 import PassengerDashboard from './pages/PassengerDashboard';
 import DriverDashboard from './pages/DriverDashboard';
+import LandingPage from './pages/LandingPage';
 
 function App() {
   return (
     <Router>
       <Routes>
+        <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginRegister />} />
         <Route path="/register" element={<LoginRegister />} />
         <Route path="/passenger" element={<PassengerDashboard />} />
