@@ -34,13 +34,29 @@ module.exports = {
       location: {
         type: Sequelize.STRING
       },
+      // Add vehicle-related fields for drivers
+      registrationNumber: {
+        type: Sequelize.STRING,
+        allowNull: true,  // Only applicable to drivers
+        unique: true
+      },
+      vehicleModel: {
+        type: Sequelize.STRING,
+        allowNull: true  // Only applicable to drivers
+      },
+      vehicleColor: {
+        type: Sequelize.STRING,
+        allowNull: true  // Only applicable to drivers
+      },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.NOW
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.NOW
       }
     });
   },

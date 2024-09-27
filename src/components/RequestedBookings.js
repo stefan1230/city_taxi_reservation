@@ -21,7 +21,7 @@ function RequestedBookings({ driverId }) {
     // Handle accepting the ride
     const handleAcceptBooking = async (bookingId) => {
         try {
-            await axios.put(`http://localhost:5000/api/driver/confirm-booking/${bookingId}`);
+            await axios.put(`http://localhost:5000/api/driver/accept-booking/${bookingId}`);
             // Update the bookings list to remove the confirmed one
             setBookings((prevBookings) => prevBookings.filter(booking => booking.id !== bookingId));
         } catch (error) {

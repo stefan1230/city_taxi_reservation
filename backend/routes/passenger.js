@@ -1,5 +1,5 @@
 const express = require('express');
-const { Booking, User } = require('../models');
+const { Booking, User, Vehicle } = require('../models');
 const router = express.Router();
 
 // Get upcoming rides for a passenger
@@ -130,14 +130,14 @@ router.post('/rate', async (req, res) => {
 
 
 router.get('/available-drivers', async (req, res) => {
-    console.log('hereee')
     try {
         const availableDrivers = await User.findAll({
             where: {
                 role: 'driver',
                 driverStatus: 'AVAILABLE',
             },
-            attributes: ['id', 'name', 'location'],  // Select necessary fields
+            include: [{ model: Vehicle, as: 'vehicles' }], // Include vehicle details
+            attributes: ['id', 'name', 'location']  // Include driver details
         });
 
         res.status(200).json(availableDrivers);

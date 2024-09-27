@@ -8,6 +8,9 @@ function LoginRegister() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [role, setRole] = useState('passenger'); // Default to 'passenger'
+    const [registrationNumber, setRegistrationNumber] = useState(''); // Vehicle registration number
+    const [model, setModel] = useState(''); // Vehicle model
+    const [color, setColor] = useState(''); // Vehicle color
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const navigate = useNavigate();
@@ -23,7 +26,7 @@ function LoginRegister() {
         try {
             const payload = isLogin
                 ? { email, password }
-                : { name, email, password, role };
+                : { name, email, password, role, registrationNumber, model, color };
 
             const url = isLogin
                 ? 'http://localhost:5000/api/auth/login'
@@ -31,16 +34,9 @@ function LoginRegister() {
 
             const response = await axios.post(url, payload);
 
-            // Set success message
             setSuccess(`${isLogin ? 'Login' : 'Registration'} successful! Redirecting...`);
 
-            console.log(isLogin);
-
-            // Simulate a delay to show success message
-            // setTimeout(() => {
-            // Navigate to respective dashboard based on role
             if (isLogin) {
-                console.log('hereee')
                 if (response.data.token) {
                     localStorage.setItem('authToken', response.data.token);
                     const { token, role, id } = response.data;
@@ -48,22 +44,19 @@ function LoginRegister() {
                     localStorage.setItem('userRole', role);
                     localStorage.setItem('userId', id);
                 }
-                const userRole = response.data.role; // Get the role from response
-                console.log(response.data)
+                const userRole = response.data.role;
                 if (userRole === 'driver') {
                     navigate('/driver');
                 } else if (userRole === 'passenger') {
                     navigate('/passenger');
                 }
             } else {
-                // For registration, navigate based on role
                 if (role === 'driver') {
                     navigate('/driver');
                 } else {
                     navigate('/passenger');
                 }
             }
-            // }, 1000); // Delay navigation by 1 second
         } catch (err) {
             setError(err.response?.data?.message || 'Error submitting form');
             setSuccess('');
@@ -73,15 +66,9 @@ function LoginRegister() {
     return (
         <div className="min-h-screen bg-gray-100 flex flex-col justify-center items-center">
             <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8">
-                {success && (
-                    <div className="mb-4 p-2 bg-green-200 text-green-800 rounded">
-                        {success}
-                    </div>
-                )}
+                {success && <div className="mb-4 p-2 bg-green-200 text-green-800 rounded">{success}</div>}
                 <div className="mb-4">
-                    <h2 className="text-xl font-bold text-center">
-                        {isLogin ? 'Login' : 'Register'}
-                    </h2>
+                    <h2 className="text-xl font-bold text-center">{isLogin ? 'Login' : 'Register'}</h2>
                 </div>
                 <form onSubmit={handleSubmit}>
                     {!isLogin && (
@@ -95,12 +82,11 @@ function LoginRegister() {
                                     id="name"
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
-                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
                                     placeholder="Your Name"
                                     required
                                 />
                             </div>
-
                             <div className="mb-4">
                                 <label htmlFor="role" className="block text-sm font-medium text-gray-700">
                                     Select Role
@@ -109,12 +95,58 @@ function LoginRegister() {
                                     id="role"
                                     value={role}
                                     onChange={(e) => setRole(e.target.value)}
-                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
                                 >
                                     <option value="passenger">Passenger</option>
                                     <option value="driver">Driver</option>
                                 </select>
                             </div>
+                            {role === 'driver' && (
+                                <>
+                                    <div className="mb-4">
+                                        <label htmlFor="registrationNumber" className="block text-sm font-medium text-gray-700">
+                                            Vehicle Registration Number
+                                        </label>
+                                        <input
+                                            type="text"
+                                            id="registrationNumber"
+                                            value={registrationNumber}
+                                            onChange={(e) => setRegistrationNumber(e.target.value)}
+                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+                                            placeholder="Your Vehicle's Registration Number"
+                                            required
+                                        />
+                                    </div>
+                                    <div className="mb-4">
+                                        <label htmlFor="model" className="block text-sm font-medium text-gray-700">
+                                            Vehicle Model
+                                        </label>
+                                        <input
+                                            type="text"
+                                            id="model"
+                                            value={model}
+                                            onChange={(e) => setModel(e.target.value)}
+                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+                                            placeholder="Vehicle Model"
+                                            required
+                                        />
+                                    </div>
+                                    <div className="mb-4">
+                                        <label htmlFor="color" className="block text-sm font-medium text-gray-700">
+                                            Vehicle Color
+                                        </label>
+                                        <input
+                                            type="text"
+                                            id="color"
+                                            value={color}
+                                            onChange={(e) => setColor(e.target.value)}
+                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+                                            placeholder="Vehicle Color"
+                                            required
+                                        />
+                                    </div>
+                                </>
+                            )}
                         </>
                     )}
 
@@ -127,7 +159,7 @@ function LoginRegister() {
                             id="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
                             placeholder="you@example.com"
                             required
                         />
@@ -142,7 +174,7 @@ function LoginRegister() {
                             id="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
                             placeholder="••••••••"
                             required
                         />
@@ -151,7 +183,7 @@ function LoginRegister() {
                     <div>
                         <button
                             type="submit"
-                            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
                         >
                             {isLogin ? 'Log In' : 'Register'}
                         </button>
@@ -161,10 +193,7 @@ function LoginRegister() {
                 {error && <p className="mt-4 text-red-500">{error}</p>}
 
                 <div className="mt-6 text-center">
-                    <button
-                        onClick={toggleForm}
-                        className="font-medium text-indigo-600 hover:text-indigo-500"
-                    >
+                    <button onClick={toggleForm} className="font-medium text-indigo-600 hover:text-indigo-500">
                         {isLogin ? 'Need an account? Register' : 'Already have an account? Login'}
                     </button>
                 </div>

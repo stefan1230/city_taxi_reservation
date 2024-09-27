@@ -28,9 +28,11 @@ module.exports = (sequelize, DataTypes) => {
         },
     }, {});
 
+    // Associate User with Bookings and Vehicles
     User.associate = function (models) {
         User.hasMany(models.Booking, { foreignKey: 'passengerId', as: 'passengerBookings' });
         User.hasMany(models.Booking, { foreignKey: 'driverId', as: 'driverBookings' });
+        User.hasMany(models.Vehicle, { foreignKey: 'driverId', as: 'vehicles' });
     };
 
     User.prototype.validPassword = function (password) {

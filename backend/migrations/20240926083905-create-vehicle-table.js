@@ -1,50 +1,35 @@
 'use strict';
 
-/** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Bookings', {
+    await queryInterface.createTable('Vehicles', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      passengerId: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        references: {
-          model: 'Users', // name of the Users table
-          key: 'id'
-        },
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE'
-      },
       driverId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'Users', // name of the Users table
+          model: 'Users',  // Assumes you have a Users table for drivers
           key: 'id'
         },
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE'
+        onDelete: 'CASCADE'  // Deletes vehicle if driver is deleted
       },
-      pickupLocation: {
+      registrationNumber: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        unique: true
+      },
+      model: {
         type: Sequelize.STRING,
         allowNull: false
       },
-      destination: {
+      color: {
         type: Sequelize.STRING,
         allowNull: false
-      },
-      fare: {
-        type: Sequelize.FLOAT,
-        allowNull: false
-      },
-      status: {
-        type: Sequelize.ENUM('REQUESTED', 'ONGOING', 'PENDING', 'CONFIRMED', 'CANCELLED', 'COMPLETED'),
-        defaultValue: 'REQUESTED'
       },
       createdAt: {
         allowNull: false,
@@ -60,6 +45,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Bookings');
+    await queryInterface.dropTable('Vehicles');
   }
 };

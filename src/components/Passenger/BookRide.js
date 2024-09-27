@@ -11,6 +11,7 @@ function BookRide({ passengerId }) {
     const [estimatedFare, setEstimatedFare] = useState('');
     const [driverId, setDriverId] = useState('');
     const [drivers, setDrivers] = useState([]);  // List of available drivers
+    const [vehicleDetails, setVehicleDetails] = useState(null);  // Store selected driver's vehicle details
     const [success, setSuccess] = useState('');
     const [pickupCoords, setPickupCoords] = useState(null);
     const [destinationCoords, setDestinationCoords] = useState(null);
@@ -29,6 +30,7 @@ function BookRide({ passengerId }) {
             try {
                 const response = await axios.get('http://localhost:5000/api/passenger/available-drivers');
                 setDrivers(response.data);
+                console.log(response);
             } catch (error) {
                 console.error('Error fetching available drivers:', error);
             }
@@ -36,6 +38,19 @@ function BookRide({ passengerId }) {
 
         fetchAvailableDrivers();
     }, []);
+
+    const handleDriverSelection = (driverId) => {
+        setDriverId(driverId);
+
+        // Find the selected driver's vehicle details and set it to the state
+        const selectedDriver = drivers.find(driver => driver.id === parseInt(driverId));
+        if (selectedDriver && selectedDriver.vehicles.length > 0) {
+            const vehicle = selectedDriver.vehicles[0];  // Assuming one vehicle per driver
+            setVehicleDetails(vehicle);
+        } else {
+            setVehicleDetails(null);  // Clear vehicle details if no vehicle found
+        }
+    };
 
     const handleEstimateFare = () => {
         if (!pickupCoords || !destinationCoords) {
@@ -89,6 +104,7 @@ function BookRide({ passengerId }) {
             setPickupLocation('');
             setDestination('');
             setDriverId('');
+            setVehicleDetails(null);
         } catch (error) {
             console.error('Error booking ride:', error);
             setSuccess('');
@@ -170,7 +186,7 @@ function BookRide({ passengerId }) {
                     <select
                         id="driver"
                         value={driverId}
-                        onChange={(e) => setDriverId(e.target.value)}
+                        onChange={(e) => handleDriverSelection(e.target.value)}
                         className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
                         required
                     >
@@ -182,6 +198,16 @@ function BookRide({ passengerId }) {
                         ))}
                     </select>
                 </div>
+
+                {/* Display selected vehicle details */}
+                {vehicleDetails && (
+                    <div className="mb-4 p-2 bg-gray-100 rounded-md">
+                        <h4 className="font-semibold mb-2">Vehicle Details:</h4>
+                        <p><strong>Registration Number:</strong> {vehicleDetails.registrationNumber}</p>
+                        <p><strong>Model:</strong> {vehicleDetails.model}</p>
+                        <p><strong>Color:</strong> {vehicleDetails.color}</p>
+                    </div>
+                )}
 
                 <div className="mb-4">
                     <button type="button" onClick={handleEstimateFare} className="py-2 px-4 bg-blue-600 text-white rounded-md">

@@ -143,7 +143,7 @@ router.get('/history/:driverId', async (req, res) => {
         }
 
         const rideHistory = await Booking.findAll({
-            where: { driverId: driverId, status: ['CONFIRMED', 'CANCELLED'] },
+            where: { driverId: driverId, status: ['CONFIRMED', 'CANCELLED', 'COMPLETED'] },
             include: [
                 { model: User, as: 'passenger', attributes: ['name'] }
             ],
@@ -162,7 +162,7 @@ router.get('/earnings/:driverId', async (req, res) => {
         const { driverId } = req.params;
 
         const confirmedRides = await Booking.findAll({
-            where: { driverId: driverId, status: 'CONFIRMED' }
+            where: { driverId: driverId, status: 'COMPLETED' }
         });
 
         // Calculate total earnings
@@ -224,24 +224,46 @@ router.get('/available-drivers', async (req, res) => {
     }
 });
 
-router.put('/confirm-booking/:bookingId', async (req, res) => {
+// router.put('/confirm-booking/:bookingId', async (req, res) => {
+//     const { bookingId } = req.params;
+
+//     try {
+//         const booking = await Booking.findByPk(bookingId);
+
+//         if (!booking || booking.status !== 'REQUESTED') {
+//             return res.status(404).json({ message: 'Booking not found or not in REQUESTED status' });
+//         }
+
+//         // Update the booking status to CONFIRMED
+//         booking.status = 'CONFIRMED';
+//         await booking.save();
+
+//         res.status(200).json({ message: 'Booking confirmed', booking });
+//     } catch (error) {
+//         console.error('Error confirming booking:', error);
+//         res.status(500).json({ message: 'Error confirming booking' });
+//     }
+// });
+
+router.put('/accept-booking/:bookingId', async (req, res) => {
     const { bookingId } = req.params;
 
     try {
+        // Find the booking by ID
         const booking = await Booking.findByPk(bookingId);
 
         if (!booking || booking.status !== 'REQUESTED') {
             return res.status(404).json({ message: 'Booking not found or not in REQUESTED status' });
         }
 
-        // Update the booking status to CONFIRMED
-        booking.status = 'CONFIRMED';
+        // Update the booking status to ONGOING
+        booking.status = 'ONGOING';
         await booking.save();
 
-        res.status(200).json({ message: 'Booking confirmed', booking });
+        res.status(200).json({ message: 'Booking accepted and is now ongoing', booking });
     } catch (error) {
-        console.error('Error confirming booking:', error);
-        res.status(500).json({ message: 'Error confirming booking' });
+        console.error('Error accepting booking:', error);
+        res.status(500).json({ message: 'Error accepting booking' });
     }
 });
 
@@ -262,6 +284,65 @@ router.get('/requested-bookings/:driverId', async (req, res) => {
         console.error('Error fetching requested bookings:', error);
         res.status(500).json({ message: 'Error fetching requested bookings' });
     }
+});
+
+// routes/driver.js
+// Get all ongoing bookings for the driver
+router.get('/ongoing-bookings/:driverId', async (req, res) => {
+    const { driverId } = req.params;
+
+    try {
+        const ongoingBookings = await Booking.findAll({
+            where: {
+                driverId,
+                status: 'ONGOING',
+            },
+            include: [{ model: User, as: 'passenger', attributes: ['name'] }]  // Include passenger details
+        });
+
+        res.status(200).json(ongoingBookings);
+    } catch (error) {
+        console.error('Error fetching ongoing bookings:', error);
+        res.status(500).json({ message: 'Error fetching ongoing bookings' });
+    }
+});
+
+router.put('/complete-booking/:bookingId', async (req, res) => {
+    const { bookingId } = req.params;
+
+    try {
+        // Find the booking by ID
+        const booking = await Booking.findByPk(bookingId);
+
+        if (!booking || booking.status !== 'ONGOING') {
+            return res.status(404).json({ message: 'Booking not found or not in ONGOING status' });
+        }
+
+        // Update the booking status to COMPLETED
+        booking.status = 'COMPLETED';
+        await booking.save();
+
+        res.status(200).json({ message: 'Booking marked as completed', booking });
+    } catch (error) {
+        console.error('Error completing booking:', error);
+        res.status(500).json({ message: 'Error completing booking' });
+    }
+});
+
+
+// Signout API (Invalidate token or clear session)
+router.post('/signout', (req, res) => {
+    // If you're using sessions
+    req.session.destroy((err) => {
+        if (err) {
+            return res.status(500).json({ message: 'Error signing out' });
+        }
+        res.clearCookie('sessionId'); // Clear session cookie
+        res.status(200).json({ message: 'Signed out successfully' });
+    });
+
+    // If using JWT, just respond success since JWT is stored on the client side
+    // res.status(200).json({ message: 'Signed out successfully' });
 });
 
 module.exports = router;
