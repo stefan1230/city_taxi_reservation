@@ -1,5 +1,5 @@
 const express = require('express');
-const { Booking, User, Vehicle } = require('../models');
+const { Booking, User, Vehicle, Rating } = require('../models');
 const router = express.Router();
 
 // Get upcoming rides for a passenger
@@ -38,7 +38,7 @@ router.get('/history/:passengerId', async (req, res) => {
         }
 
         const rideHistory = await Booking.findAll({
-            where: { passengerId: passengerId, status: ['CONFIRMED', 'CANCELLED'] },
+            where: { passengerId: passengerId, status: ['CONFIRMED', 'CANCELLED', 'COMPLETED'] },
             include: [
                 { model: User, as: 'driver', attributes: ['name'] }
             ],
@@ -106,7 +106,6 @@ router.post('/rate', async (req, res) => {
     try {
         const { passengerId, driverId, rating } = req.body;
 
-        // Validate the passenger and driver exist
         const passenger = await User.findByPk(passengerId);
         const driver = await User.findByPk(driverId);
 
@@ -118,8 +117,6 @@ router.post('/rate', async (req, res) => {
             return res.status(404).json({ message: 'Driver not found' });
         }
 
-        // Here you would update the driver's rating or store the rating in another table.
-        // Assume you have a separate Ratings model that tracks passenger ratings for drivers
         const ratingRecord = await Rating.create({ passengerId, driverId, rating });
 
         res.status(201).json({ message: 'Rating submitted successfully', rating: ratingRecord });
@@ -127,6 +124,7 @@ router.post('/rate', async (req, res) => {
         res.status(500).json({ message: 'Server error', error });
     }
 });
+
 
 
 router.get('/available-drivers', async (req, res) => {
