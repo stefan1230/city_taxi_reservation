@@ -28,7 +28,7 @@ app.get('/', (req, res) => {
 });
 
 // Connect to the database and start the server
-const PORT = process.env.PORT || 5000;
+const PORT = 5000;
 
 sequelize.authenticate()
     .then(() => {
