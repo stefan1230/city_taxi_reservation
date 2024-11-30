@@ -50,6 +50,39 @@ router.get('/history/:passengerId', async (req, res) => {
     }
 });
 
+// Check if a passenger has an ongoing trip
+router.get('/ongoing-trip/:passengerId', async (req, res) => {
+    try {
+        const { passengerId } = req.params;
+
+        // Validate passenger
+        const passenger = await User.findByPk(passengerId);
+        if (!passenger || passenger.role !== 'passenger') {
+            return res.status(404).json({ message: 'Passenger not found' });
+        }
+
+        // Check if there's an ongoing trip
+        const ongoingTrip = await Booking.findOne({
+            where: {
+                passengerId: passengerId,
+                status: 'ONGOING', // Ensure this matches the status for ongoing rides
+            },
+            include: [{ model: User, as: 'driver', attributes: ['name', 'location'] }], // Optionally include driver info
+        });
+
+        if (ongoingTrip) {
+            console.log(ongoingTrip)
+            return res.status(200).json({ hasOngoingTrip: true, trip: ongoingTrip });
+        } else {
+            return res.status(200).json({ hasOngoingTrip: false });
+        }
+    } catch (error) {
+        console.error('Error checking for ongoing trip:', error);
+        res.status(500).json({ message: 'Server error', error });
+    }
+});
+
+
 // Book a ride
 router.post('/book', async (req, res) => {
     try {

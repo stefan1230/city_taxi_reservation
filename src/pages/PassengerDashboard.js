@@ -8,17 +8,20 @@ import RateDriver from '../components/Passenger/RateDriver';
 function PassengerDashboard() {
     const [passengerId, setPassengerId] = useState(null);
     const navigate = useNavigate();  // Use navigate for redirecting
+    const [passengerName, setPassengerName] = useState('');
 
     useEffect(() => {
         // Retrieve passengerId from localStorage (or use auth system)
         const id = localStorage.getItem('userId');
         const role = localStorage.getItem('userRole');
+        const name = localStorage.getItem('userName');
 
         if (role !== 'passenger') {
             console.error('Access denied: Not a passenger');
             navigate('/login');
         } else {
             setPassengerId(id);
+            setPassengerName(name)
         }
     }, [navigate]);
 
@@ -37,7 +40,9 @@ function PassengerDashboard() {
 
     return (
         <div className="min-h-screen bg-gray-100 p-8">
-            <h1 className="text-2xl font-bold mb-8">Passenger Dashboard</h1>
+            <h1 className="text-2xl font-bold mb-8">
+                Hello, {passengerName}! Welcome to your Dashboard
+            </h1>
             <button
                 onClick={handleSignOut}
                 className="mb-4 py-2 px-4 bg-red-600 text-white rounded-md shadow-sm">

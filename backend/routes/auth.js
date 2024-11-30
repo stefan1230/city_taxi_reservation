@@ -29,42 +29,73 @@ const router = express.Router();
 //     }
 // });
 
+// router.post('/register', async (req, res) => {
+//     const { name, email, password, role, registrationNumber, model, color } = req.body;
+
+//     try {
+//         // Check if email already exists
+//         const existingUser = await User.findOne({ where: { email } });
+//         if (existingUser) {
+//             return res.status(400).json({ message: 'Email already exists' });
+//         }
+
+//         // Hash password
+//         const hashedPassword = bcrypt.hashSync(password, 10);
+
+//         // Create user (driver)
+//         const user = await User.create({
+//             name,
+//             email,
+//             password: hashedPassword,
+//             role,  // Ensure role is 'driver'
+//             driverStatus: 'AVAILABLE',
+//         });
+
+//         // Create vehicle associated with the driver
+//         const vehicle = await Vehicle.create({
+//             driverId: user.id,
+//             registrationNumber,
+//             model,
+//             color,
+//         });
+
+//         res.status(201).json({ message: 'Driver and vehicle registered successfully', user, vehicle });
+//     } catch (error) {
+//         console.error('Error registering driver:', error);
+//         res.status(500).json({ message: 'Server error' });
+//     }
+// });
+
 router.post('/register', async (req, res) => {
     const { name, email, password, role, registrationNumber, model, color } = req.body;
 
     try {
-        // Check if email already exists
-        const existingUser = await User.findOne({ where: { email } });
-        if (existingUser) {
-            return res.status(400).json({ message: 'Email already exists' });
-        }
-
-        // Hash password
-        const hashedPassword = bcrypt.hashSync(password, 10);
-
-        // Create user (driver)
+        // Create user
+        const hashedPassword = await bcrypt.hash(password, 10);
         const user = await User.create({
             name,
             email,
             password: hashedPassword,
-            role,  // Ensure role is 'driver'
-            driverStatus: 'AVAILABLE',
+            role,
         });
 
-        // Create vehicle associated with the driver
-        const vehicle = await Vehicle.create({
-            driverId: user.id,
-            registrationNumber,
-            model,
-            color,
-        });
+        // If the role is 'driver', add vehicle details
+        if (role === 'driver') {
+            await Vehicle.create({
+                driverId: user.id, // Assuming 'Vehicle' table has a foreign key to 'User'
+                registrationNumber,
+                model,
+                color,
+            });
+        }
 
-        res.status(201).json({ message: 'Driver and vehicle registered successfully', user, vehicle });
+        res.status(201).json({ message: 'User registered successfully' });
     } catch (error) {
-        console.error('Error registering driver:', error);
-        res.status(500).json({ message: 'Server error' });
+        console.error(error);
+        res.status(500).json({ message: 'Error registering user', error });
     }
 });
+
 
 // Login Route
 router.post('/login', async (req, res) => {
@@ -78,7 +109,7 @@ router.post('/login', async (req, res) => {
         const token = jwt.sign({ id: user.id }, 'your_jwt_secret', { expiresIn: '1h' });
 
         // Return role in response
-        res.send({ message: 'Login successful', token, role: user.role, id: user.id });
+        res.send({ message: 'Login successful', token, role: user.role, id: user.id, name: user.name });
     } catch (err) {
         res.status(500).send({ message: 'Server error' });
     }

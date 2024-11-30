@@ -34,15 +34,17 @@ function LoginRegister() {
 
             const response = await axios.post(url, payload);
 
-            setSuccess(`${isLogin ? 'Login' : 'Registration'} successful! Redirecting...`);
+            setSuccess(`${isLogin ? 'Login' : 'Registration'} successful!`);
 
             if (isLogin) {
                 if (response.data.token) {
                     localStorage.setItem('authToken', response.data.token);
-                    const { token, role, id } = response.data;
+                    const { token, role, id, name } = response.data;
+                    console.log(response.data);
                     localStorage.setItem('authToken', token);
                     localStorage.setItem('userRole', role);
                     localStorage.setItem('userId', id);
+                    localStorage.setItem('userName', name);
                 }
                 const userRole = response.data.role;
                 if (userRole === 'driver') {
@@ -51,10 +53,11 @@ function LoginRegister() {
                     navigate('/passenger');
                 }
             } else {
+                setIsLogin(!isLogin);
                 if (role === 'driver') {
-                    navigate('/driver');
+                    navigate('/login');
                 } else {
-                    navigate('/passenger');
+                    navigate('/login');
                 }
             }
         } catch (err) {
